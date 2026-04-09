@@ -3,6 +3,8 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { store } from '@/store'
 
+import NumericInput from '@/components/input/NumericInput'
+
 const route = useRoute()
 
 const person = computed(() => {
@@ -15,6 +17,9 @@ function updateAge(value: string) {
     person.value.ageInHours = Number(value) || 0
   }
 }
+
+const label = computed<string>(() => (`${person.value?.name || ""} is`).toUpperCase(), {})
+
 </script>
 
 <template>
@@ -27,22 +32,7 @@ function updateAge(value: string) {
         :alt="person.name"
         class="w-14 h-14 rounded-full border-2 border-violet-500 object-cover"
       />
-      <div>
-        <label for="hours-input" class="block text-sm font-bold tracking-wide text-gray-700">
-          {{ person.name.toUpperCase() }} IS
-        </label>
-        <div class="flex items-center gap-2">
-          <input
-            id="hours-input"
-            type="text"
-            :value="person.ageInHours"
-            @input="updateAge(($event.target as HTMLInputElement).value)"
-            class="border border-gray-300 rounded px-2 py-1 text-lg outline-none"
-            placeholder="0"
-          />
-          <span class="text-gray-600">hours old</span>
-        </div>
-      </div>
+      <NumericInput v-model="person.ageInHours" :label="label" hint=" hours old"/>
     </div>
   </div>
 
