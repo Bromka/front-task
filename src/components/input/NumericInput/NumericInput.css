@@ -2,25 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Koulen&display=swap');
 
 .numeric-input {
-  --ni-radius:       8px;
-  --ni-height:       44px;
 
-  --ni-bg:           #ffffff;
-  --ni-border:       #CFCADF;
-  --ni-border-focus: #906FEE;
-  --ni-border-error: #ef4444;
-  --ni-text:         #1E0E4C;
-  --ni-placeholder:  #9ca3af;
-  --ni-hint:         #6b7280;
-  --ni-error-color:  #ef4444;
-  --ni-btn-bg:       #f3f4f6;
-  --ni-btn-hover:    #e5e7eb;
-  --ni-btn-active:   #d1d5db;
-  --ni-btn-icon:     #374151;
-  --ni-disabled-bg:  #f9fafb;
-  --ni-disabled-text:#9ca3af;
-  --ni-label-primary: #3D06D7;
-  --ni-label-dark: #1E0E4C;
 
   display: flex;
   flex-direction: column;

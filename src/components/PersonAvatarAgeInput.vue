@@ -62,7 +62,7 @@ const avatarClasses = computed(() => ({
 }
 
 .person-avatar-age-input__avatar__wrapper.person-avatar-age-input__avatar--input-focused {
-  border: 1px solid #3D06D7;
+  border: 1px solid var(--ni-avatar-border);
 }
 
 .person-avatar-age-input__avatar {
