@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { store } from '@/store'
 
-import NumericInput from '@/components/input/NumericInput'
+import PersonAvatarAgeInput from '@/components/PersonAvatarAgeInput.vue'
 
 const route = useRoute()
 
@@ -12,28 +12,14 @@ const person = computed(() => {
   return store.people.find((p) => p.id === id)
 })
 
-function updateAge(value: string) {
-  if (person.value) {
-    person.value.ageInHours = Number(value) || 0
-  }
-}
-
-const label = computed<string>(() => (`${person.value?.name || ""} is`).toUpperCase(), {})
+const label = computed(() => (`${person.value?.name ?? ''} is`).toUpperCase())
 
 </script>
 
 <template>
   <div v-if="person" class="flex flex-col gap-4">
     <router-link to="/" class="text-violet-600 hover:underline text-sm">&larr; Back</router-link>
-
-    <div class="flex items-center gap-3">
-      <img
-        src="/img.png"
-        :alt="person.name"
-        class="w-14 h-14 rounded-full border-2 border-violet-500 object-cover"
-      />
-      <NumericInput v-model="person.ageInHours" :label="label" hint=" hours old"/>
-    </div>
+    <PersonAvatarAgeInput v-model="person.ageInHours" :name="person.name" :label="label" hint=" hours old" />
   </div>
 
   <div v-else>

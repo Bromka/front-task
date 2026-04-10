@@ -15,6 +15,7 @@
           class="numeric-input__field"
           type="text"
           inputmode="numeric"
+          :size="inputSize"
           :value="displayValue"
           :disabled="disabled"
           :placeholder="placeholder"
@@ -40,7 +41,7 @@ export default {
 }
 </script>
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import './NumericInput.css'
 
 const props = defineProps({
@@ -90,7 +91,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur'])
+const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur', 'focused-change'])
 
 const inputRef = ref(null)
 const focused = ref(false)
@@ -107,10 +108,26 @@ function formatDisplay(v) {
   return v.toLocaleString('ru-RU')
 }
 
+function formatEditableInput(value) {
+  if (value === '' || value === '-') return value
+
+  const negative = value.startsWith('-')
+  const digits = value.replace('-', '')
+  const groupedDigits = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+
+  return negative ? `-${groupedDigits}` : groupedDigits
+}
+
 const displayValue = computed(() => {
-  if (isEditing.value) return formatDisplay(rawInput.value);
+  if (isEditing.value) return formatEditableInput(rawInput.value)
   if (clampedValue.value === null) return ''
   return formatDisplay(clampedValue.value)
+})
+
+const inputSize = computed(() => {
+  const text = displayValue.value
+  // `size` is in characters; keep a sensible minimum so it doesn't jitter.
+  return Math.max(4, String(text || props.placeholder || '').length)
 })
 
 const errorMessage = computed(() => {
@@ -161,6 +178,7 @@ function onFocus(e) {
   isEditing.value = true
   rawInput.value = clampedValue.value !== null ? String(clampedValue.value) : ''
   emit('focus', e)
+  emit('focused-change', true)
 }
 
 function onBlur(e) {
@@ -173,13 +191,43 @@ function onBlur(e) {
     emit('update:modelValue', null)
   }
   emit('blur', e)
+  emit('focused-change', false)
 }
 
 function onInput(e) {
-  // Allow only digits and a leading minus sign
-  const filtered = e.target.value.replace(/[^\d-]/g, '').replace(/(?!^)-/g, '')
+  const inputEl = e.target
+  const cursor = inputEl.selectionStart ?? inputEl.value.length
+  const textBeforeCursor = inputEl.value.slice(0, cursor)
+  const digitsBeforeCursor = (textBeforeCursor.match(/\d/g) || []).length
+  const minusBeforeCursor = textBeforeCursor.includes('-')
+
+  // Allow only digits and a leading minus sign.
+  const filtered = inputEl.value.replace(/[^\d-]/g, '').replace(/(?!^)-/g, '')
   rawInput.value = filtered
-  e.target.value = filtered
+
+  const formatted = formatEditableInput(filtered)
+  inputEl.value = formatted
+
+  nextTick(() => {
+    const activeInput = inputRef.value
+    if (!activeInput) return
+
+    let nextCursor = 0
+    let digitsSeen = 0
+
+    if (minusBeforeCursor && formatted.startsWith('-')) {
+      nextCursor = 1
+    }
+
+    while (nextCursor < formatted.length && digitsSeen < digitsBeforeCursor) {
+      if (/\d/.test(formatted[nextCursor])) {
+        digitsSeen += 1
+      }
+      nextCursor += 1
+    }
+
+    activeInput.setSelectionRange(nextCursor, nextCursor)
+  })
 }
 
 function onKeydown(e) {

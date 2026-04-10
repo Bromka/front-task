@@ -2,6 +2,8 @@
 import { computed } from 'vue'
 import { store } from '@/store'
 
+const avatarSrc = import.meta.env.DEV ? '/img.png' : `${import.meta.env.BASE_URL}img.png`
+
 const peopleWithYears = computed(() => {
   return store.people.map((person) => ({
     ...person,

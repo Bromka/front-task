@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/test-input/',
+  base: '/front-task/',
   plugins: [
     vue(),
     vueDevTools(),
